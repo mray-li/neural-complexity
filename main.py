@@ -227,6 +227,7 @@ if not args.interact:
     else:
         train_data = batchify(corpus.train, args.batch_size)
         val_data = batchify(corpus.valid, args.batch_size)
+   
 
 ###############################################################################
 # Build/load the model
@@ -476,6 +477,7 @@ def test_evaluate(test_sentences, data_source):
                         print(*list(hidden[1][args.view_layer].view(1, -1).data.cpu().numpy().flatten()), sep=' ')
         else:
             data = data.unsqueeze(1) # only needed when a single sentence is being processed
+            data = torch.tensor(data).to(device).long()
             output, hidden = model(data, hidden)
             try:
                 output_flat = output.view(-1, ntokens)
@@ -525,6 +527,7 @@ def evaluate(data_source):
     with torch.no_grad():
         for i in range(0, data_source.size(0) - 1, args.bptt):
             data, targets = get_batch(data_source, i)
+            data = torch.tensor(data).to(device).long()
             output, hidden = model(data, hidden)
             output_flat = output.view(-1, ntokens)
             total_loss += len(data) * criterion(output_flat, targets.long()).item()
@@ -545,6 +548,8 @@ def train():
         # If we didn't, the model would try backpropagating all the way to start of the dataset.
         hidden = repackage_hidden(hidden)
         model.zero_grad()
+#         hidden = [torch.tensor(x).to(device).long() for x in hidden]
+        data=torch.tensor(data).to(device).long()
         output, hidden = model(data, hidden)
         loss = criterion(output.view(-1, ntokens), targets.long())
         loss.backward()

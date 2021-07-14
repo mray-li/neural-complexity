@@ -49,6 +49,7 @@ class SentenceCorpus(object):
             self.dictionary = Dictionary()
             self.train = self.tokenize(os.path.join(path, trainfname))
             self.valid = self.tokenize_with_unks(os.path.join(path, validfname))
+            
             try:
                 # don't require a test set at train time,
                 # but if there is one, get a sense of whether unks will be required
@@ -73,6 +74,7 @@ class SentenceCorpus(object):
                 # load from a checkpoint
                 self.train = self.tokenize_with_unks(os.path.join(path, trainfname))
                 self.valid = self.tokenize_with_unks(os.path.join(path, validfname))
+                
 
 
     def save_dict(self, path):
@@ -247,7 +249,7 @@ class SentenceCorpus(object):
                         else:
                             words = line.split() + ['<eos>']
                         tokens += len(words)
-
+            
             # Tokenize file content
             with gzip.open(path, 'rb') as file_handle:
                 ids = torch.IntTensor(tokens)
@@ -288,7 +290,9 @@ class SentenceCorpus(object):
             with open(path, 'r') as file_handle:
                 tokens = 0
                 first_flag = True
+                print(file_handle)
                 for fchunk in file_handle:
+                    
                     for line in sent_tokenize(fchunk):
                         if line.strip() == '':
                             # Ignore blank lines
@@ -299,7 +303,8 @@ class SentenceCorpus(object):
                         else:
                             words = line.split() + ['<eos>']
                         tokens += len(words)
-
+                        
+            
             # Tokenize file content
             with open(path, 'r') as file_handle:
                 ids = torch.IntTensor(tokens)
